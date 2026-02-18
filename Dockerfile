@@ -12,6 +12,5 @@ COPY . .
 
 # Set environment variable (will be overridden by deployment platform)
 ENV PYTHONUNBUFFERED=1
-
-# Run the bot
-CMD ["python", "main.py"]
+EXPOSE 10000
+CMD ["sh", "-c", "python main.py & sleep 3600"]
