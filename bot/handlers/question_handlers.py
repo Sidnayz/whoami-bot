@@ -1,7 +1,7 @@
 """Question and callback handlers."""
 
-from aiogram import Router, F
-from aiogram.filters import Command
+from aiogram import Router
+from aiogram.filters import Command, Text
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
@@ -64,7 +64,7 @@ async def handle_question(message: Message):
 callback_router = Router()
 
 
-@callback_router.callback_query(F.data.startswith('answer:'))
+@callback_router.callback_query(Text(startswith='answer:'))
 async def handle_answer_callback(callback: CallbackQuery):
     """Handle answer button clicks."""
     if not callback.message:
