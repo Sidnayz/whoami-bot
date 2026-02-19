@@ -1,7 +1,6 @@
 """Question and callback handlers."""
 
-from aiogram import Router
-from aiogram.filters import F
+from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
