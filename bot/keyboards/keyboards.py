@@ -10,5 +10,6 @@ def get_answer_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text='Нет', callback_data='answer:no')],
         [InlineKeyboardButton(text='Не знаю', callback_data='answer:dont_know')],
         [InlineKeyboardButton(text='Частично', callback_data='answer:partially')],
+        [InlineKeyboardButton(text='✅ Угадали!', callback_data='answer:guessed')],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)

@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from bot.services import game_manager, GameState
+from bot.services.game_state import game_manager, GameState
 from bot.utils import is_admin
 
 group_router = Router()
@@ -18,7 +18,8 @@ async def cmd_start_help(message: Message):
         "<b>Правила:</b>\n"
         "• Один игрок загадывает персонажа\n"
         "• Остальные задают вопросы\n"
-        "• Загадывающий отвечает кнопками: Да/Нет/Не знаю/Частично\n\n"
+        "• Загадывающий отвечает кнопками: Да/Нет/Не знаю/Частично\n"
+        "• Когда кто-то угадал, нажмите «✅ Угадали!»\n\n"
         "<b>Команды:</b>\n"
         "/startgame — начать новую игру\n"
         "/endgame — завершить игру (для загадывающего или админа)\n"
@@ -72,7 +73,13 @@ async def cmd_endgame(message: Message):
     game_data = game_manager.end_game(chat_id)
 
     if game_data and game_data.character:
-        await message.answer(f"Игра окончена. Загаданный персонаж был: <b>{game_data.character}</b>", parse_mode='HTML')
+        if game_data.winner_username:
+            await message.answer(
+                f"🎉 <b>Игра окончена!</b>\nПобедитель: {game_data.winner_username}\nЗагаданный персонаж был: <b>{game_data.character}</b>",
+                parse_mode='HTML'
+            )
+        else:
+            await message.answer(f"Игра окончена. Загаданный персонаж был: <b>{game_data.character}</b>", parse_mode='HTML')
     else:
         await message.answer("Игра остановлена до ввода персонажа.")
 

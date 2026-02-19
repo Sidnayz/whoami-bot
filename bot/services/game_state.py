@@ -1,7 +1,7 @@
 """Game state management module."""
 
 from typing import Dict, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -20,6 +20,7 @@ class GameData:
     host_username: Optional[str] = None
     character: Optional[str] = None
     waiting_for_character: bool = False
+    winner_username: Optional[str] = None  # New field for winner
 
 
 class GameManager:
@@ -58,31 +59,34 @@ class GameManager:
             return True
         return False
 
-    def is_waiting_for_character(self, chat_id: int, user_id: int) -> bool:
-        """Check if user is waiting to input character."""
+    def set_winner(self, chat_id: int, username: str) -> None:
+        """Set the winner when the character is guessed correctly."""
         game = self.games.get(chat_id)
-        return (
-            game is not None
-            and game.host_id == user_id
-            and game.state == GameState.WAITING_CHARACTER
-            and game.waiting_for_character
-        )
+        if game:
+            game.winner_username = username
 
     def end_game(self, chat_id: int) -> Optional[GameData]:
         """End a game and return the game data."""
         return self.games.pop(chat_id, None)
 
-    def has_active_game(self, chat_id: int) -> bool:
-        """Check if chat has any non-idle game."""
-        game = self.games.get(chat_id)
-        return game is not None and game.state != GameState.IDLE
-
     def get_host_game(self, user_id: int) -> Optional[tuple[int, GameData]]:
-        """Get a game where user is host and waiting for character."""
+        """Find game where user is the host."""
         for chat_id, game in self.games.items():
-            if game.host_id == user_id and game.state == GameState.WAITING_CHARACTER:
+            if game.host_id == user_id:
                 return chat_id, game
         return None
+
+    def is_waiting_for_character(self, chat_id: int, user_id: int) -> bool:
+        """Check if user is waiting to input character."""
+        game = self.games.get(chat_id)
+        if game and game.host_id == user_id:
+            return game.waiting_for_character
+        return False
+
+    def has_active_game(self, chat_id: int) -> bool:
+        """Check if chat has an active game."""
+        game = self.games.get(chat_id)
+        return game is not None and game.state != GameState.IDLE
 
 
 # Global instance

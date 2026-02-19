@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
-from bot.services import game_manager, GameState
+from bot.services.game_state import game_manager, GameState
 from bot.keyboards import get_answer_keyboard
 
 
@@ -83,6 +83,44 @@ async def handle_answer_callback(callback: CallbackQuery):
     # Check if user is host
     if game.host_id != user_id:
         await callback.answer("Отвечать на вопросы может только загадывающий.")
+        return
+
+    # Check if it's the "guessed" button
+    if callback.data == 'answer:guessed':
+        # Get the username from the original question message
+        username_text = f"@{callback.from_user.username}" if callback.from_user.username else f"ID {callback.from_user.id}"
+
+        # Set winner
+        game_manager.set_winner(chat_id, username_text)
+
+        # End game
+        game_data = game_manager.end_game(chat_id)
+
+        if game_data and game_data.character:
+            # Edit message to show winner and character
+            try:
+                current_text = callback.message.text or ''
+                updated_text = f"{current_text}\n\n🎉 <b>Правильно!</b>\nЗагаданный персонаж: <b>{game_data.character}</b>"
+
+                await callback.message.edit_reply_markup(reply_markup=None)
+                await callback.message.edit_text(
+                    updated_text,
+                    parse_mode='HTML'
+                )
+
+                # Send announcement to chat
+                await callback.message.answer(
+                    f"🎉 <b>Игра окончена!</b>\nУчастник {username_text} угадал персонажа: <b>{game_data.character}</b>",
+                    parse_mode='HTML'
+                )
+            except TelegramBadRequest:
+                await callback.message.answer(
+                    f"🎉 <b>Игра окончена!</b>\nУчастник {username_text} угадал персонажа: <b>{game_data.character}</b>",
+                    parse_mode='HTML'
+                )
+        else:
+            await callback.message.answer("Ошибка: персонаж не найден.")
+        await callback.answer()
         return
 
     # Get answer text
