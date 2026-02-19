@@ -6,7 +6,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from bot.services import game_manager
+from bot.services.game_state import game_manager
 from bot.keyboards import get_answer_keyboard
 
 private_router = Router()
