@@ -63,13 +63,17 @@ async def handle_question(message: Message):
 
 
 callback_router = Router()
-callback_router.callback_query.filter(F.message.chat.type.in_({"group", "supergroup"}))
 
 
-@callback_router.callback_query(lambda c: c.data.startswith('answer:'))
+@callback_router.callback_query(F.data.startswith('answer:'))
 async def handle_answer_callback(callback: CallbackQuery):
     """Handle answer button clicks."""
     if not callback.message:
+        await callback.answer()
+        return
+
+    # Check if message is from group chat
+    if callback.message.chat.type not in ("group", "supergroup"):
         await callback.answer()
         return
 
@@ -87,9 +91,9 @@ async def handle_answer_callback(callback: CallbackQuery):
         await callback.answer("Отвечать на вопросы может только загадывающий.")
         return
 
-    # Check if it's the "guessed" button
+    # Check if it's "guessed" button
     if callback.data == 'answer:guessed':
-        # Get the username from the original question message
+        # Get username from original question message
         username_text = f"@{callback.from_user.username}" if callback.from_user.username else f"ID {callback.from_user.id}"
 
         # Set winner
