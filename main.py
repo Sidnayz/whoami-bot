@@ -265,7 +265,7 @@ async def cmd_status(message: Message):
         )
 
 
-@group_router.message(Command('mygame'))
+@group_router.message(Command('mygame'), F.chat.type.in_(["group", "supergroup"]))
 async def cmd_mygame_warning(message: Message):
     """Handle /mygame command in groups - warn user to use private chat."""
     await message.answer("⚠️ Команда /mygame работает только в личных сообщениях бота. Нажмите на имя бота и напишите /mygame там.")
@@ -299,7 +299,7 @@ async def private_cmd_start_help(message: Message):
     await message.answer(help_text, parse_mode='HTML')
 
 
-@private_router.message(Command('mygame'))
+@private_router.message(Command('mygame'), F.chat.type == "private")
 async def private_cmd_mygame(message: Message, state: FSMContext):
     """Handle /mygame command in private chat."""
     user_id = message.from_user.id
