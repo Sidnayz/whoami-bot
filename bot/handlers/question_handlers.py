@@ -1,7 +1,7 @@
 """Question and callback handlers."""
 
 from aiogram import Router
-from aiogram.filters import ChatTypeFilter
+from aiogram.filters import F
 from aiogram.types import Message, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
@@ -10,7 +10,7 @@ from bot.keyboards import get_answer_keyboard
 
 
 question_router = Router()
-question_router.message.filter(ChatTypeFilter("group"))
+question_router.message.filter(F.chat.type.in_({"group", "supergroup"}))
 
 
 # Dictionary to map callback data to Russian answer text
@@ -63,7 +63,7 @@ async def handle_question(message: Message):
 
 
 callback_router = Router()
-callback_router.callback_query.filter(ChatTypeFilter("group"))
+callback_router.callback_query.filter(F.message.chat.type.in_({"group", "supergroup"}))
 
 
 @callback_router.callback_query(lambda c: c.data.startswith('answer:'))
