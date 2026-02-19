@@ -10,7 +10,6 @@ from bot.keyboards import get_answer_keyboard
 
 
 question_router = Router()
-question_router.message.filter(F.chat.type.in_({"group", "supergroup"}))
 
 
 # Dictionary to map callback data to Russian answer text
@@ -69,11 +68,6 @@ callback_router = Router()
 async def handle_answer_callback(callback: CallbackQuery):
     """Handle answer button clicks."""
     if not callback.message:
-        await callback.answer()
-        return
-
-    # Check if message is from group chat
-    if callback.message.chat.type not in ("group", "supergroup"):
         await callback.answer()
         return
 
