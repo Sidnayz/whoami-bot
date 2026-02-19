@@ -302,8 +302,6 @@ class CharacterInputState(StatesGroup):
 @private_router.message(Command('start', 'help'))
 async def private_cmd_start_help(message: Message):
     """Handle /start and /help commands in private chat."""
-    if message.chat.type != "private":
-        return
     help_text = (
         "🎮 <b>Игра «Угадай персонажа»</b>\n\n"
         "Это бот для групповой игры в угадывание персонажа.\n\n"
@@ -322,8 +320,6 @@ async def private_cmd_start_help(message: Message):
 @private_router.message(Command('mygame'))
 async def private_cmd_mygame(message: Message, state: FSMContext):
     """Handle /mygame command in private chat."""
-    if message.chat.type != "private":
-        return
     user_id = message.from_user.id
 
     host_game = game_manager.get_host_game(user_id)
@@ -343,8 +339,6 @@ async def private_cmd_mygame(message: Message, state: FSMContext):
 @private_router.message(StateFilter(CharacterInputState.waiting_character))
 async def private_process_character_input(message: Message, state: FSMContext, bot: Bot):
     """Process character name input."""
-    if message.chat.type != "private":
-        return
     user_id = message.from_user.id
 
     host_game = game_manager.get_host_game(user_id)
